@@ -1,0 +1,21 @@
+# Rust artifacts
+/target
+Cargo.lock
+**/*.rs.bk
+
+# Environment & Secrets
+.env
+.env.local
+.netlify/
+
+# Node/Web artifacts
+node_modules/
+dist/
+build/
+.DS_Store
+
+# Mobile/Flutter
+.dart_tool/
+.packages
+.pub-cache/
+.pub/
