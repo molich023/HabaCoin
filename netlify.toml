@@ -1,11 +1,14 @@
 [build]
-  command = "npm run build"
-  publish = "dist"
+  command = "curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh && wasm-pack build miner-client --target web --out-dir ../public/wasm && npm run build"
+  publish = "public"
 
-[dev]
-  port = 8888
+[functions]
+  directory = "netlify/functions"
 
-[[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200
+[[edge_functions]]
+  path = "/api/*"
+  function = "haba-handler"
+
+[identity]
+  external_providers = ["google", "github"]
+  
