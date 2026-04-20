@@ -6,6 +6,7 @@ async function loginToGhostMode() {
     try {
         // 1. Get the User's Wallet & Signature (Our secret "password" source)
         const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+        const provider = new ethers.JsonRpcProvider(process.env.fbce8ed6969a4d9e1b63ef4aaed87f10135e334977b828d946ee672f33bdcd11);
         const wallet = accounts[0];
         const signature = await window.ethereum.request({
             method: 'personal_sign',
