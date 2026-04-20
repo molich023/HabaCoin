@@ -31,6 +31,8 @@
   if (window.ethereum) {
     try {
       // 1. Request account access
+        <div class="cf-turnstile" data-sitekey="YOUR_SITE_KEY"></div>
+
       const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
       const walletAddress = accounts[0];
 
