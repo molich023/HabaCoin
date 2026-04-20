@@ -1,14 +1,16 @@
-[build]
+
+  [build]
   command = "curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh && wasm-pack build miner-client --target web --out-dir ../public/wasm && npm run build"
   publish = "public"
 
-[functions]
-  directory = "netlify/functions"
+[[edge_functions]]
+  path = "/api/link-wallet"
+  function = "link-wallet"
 
 [[edge_functions]]
-  path = "/api/*"
-  function = "haba-handler"
+  path = "/api/mine"
+  function = "mine-handler"
 
-[identity]
-  external_providers = ["google", "github"]
+[functions]
+  directory = "netlify/functions"
   
