@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HabaCoin Global</title>
+    <link rel="manifest" href="/manifest.json">
+    <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+    <style>
+        body { background: #000; color: #fff; font-family: 'Inter', sans-serif; text-align: center; }
+        .card { background: #111; border: 1px solid #333; padding: 2rem; border-radius: 20px; margin: 2rem auto; max-width: 400px; }
+        .btn { background: #27ae60; color: #fff; border: none; padding: 12px 24px; border-radius: 50px; cursor: pointer; font-weight: bold; width: 100%; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>HabaCoin</h1>
+        <div data-netlify-identity-menu></div>
+        <div data-netlify-identity-button></div>
+        
+        <hr style="border: 0.5px solid #333; margin: 20px 0;">
+        
+        <div class="cf-turnstile" data-sitekey="YOUR_TURNSTILE_SITE_KEY"></div>
+        
+        <button class="btn" onclick="linkWallet()" style="margin-top: 10px;">Link Polygon Wallet</button>
+    </div>
+
+    <script>
+        async function linkWallet() {
+            if (!window.ethereum) return alert("Install MetaMask!");
+            const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+            const message = `Authorize HabaCoin Profile: ${accounts[0]}`;
+            const signature = await window.ethereum.request({ method: 'personal_sign', params: [message, accounts[0]] });
+            const captcha = document.querySelector('[name="cf-turnstile-response"]').value;
+
+            await fetch('/api/link-wallet', {
+                method: 'POST',
+                body: JSON.stringify({ wallet: accounts[0], signature, message, captcha })
+            });
+            alert("Wallet Linked!");
+        }
+
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js'));
+        }
+    </script>
+</body>
+</html>
