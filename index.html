@@ -23,6 +23,36 @@
           navigator.serviceWorker.register('/sw.js');
         });
       }
+        async function linkWallet() {
+  if (window.ethereum) {
+    try {
+      // 1. Request account access
+      const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+      const walletAddress = accounts[0];
+
+      // 2. Create a message for the user to sign (Proof of Ownership)
+      const message = `Linking HabaCoin Profile to: ${walletAddress}`;
+      const signature = await window.ethereum.request({
+        method: 'personal_sign',
+        params: [message, walletAddress],
+      });
+
+      // 3. Send address and signature to our Backend (Edge Function)
+      const response = await fetch('/api/link-wallet', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ walletAddress, signature })
+      });
+
+      if (response.ok) alert("Wallet Linked Successfully!");
+    } catch (error) {
+      console.error("User denied wallet connection", error);
+    }
+  } else {
+    alert("Please install a Crypto Wallet like MetaMask to link your account.");
+  }
+              }
+        
     </script>
 </body>
 </html>
