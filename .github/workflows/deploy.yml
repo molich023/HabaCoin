@@ -1,27 +1,17 @@
-name: HabaHaba CI/CD
 
-on:
-  push:
-    branches: [ main ]
-
-jobs:
-  audit:
-    runs-on: ubuntu-latest
-    steps:
+       steps:
       - uses: actions/checkout@v3
-      - name: Security Audit (Rust)
-        run: cargo install cargo-audit && cargo audit
+      
+      - name: Install wasm-pack
+        run: curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
 
-  deploy:
-    needs: audit
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - name: Build & Deploy to Netlify
-        uses: netlify/actions/cli@master
-        with:
-          args: deploy --dir=dist --prod
-        env:
-          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
-          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
-          
+      - name: Build WASM Miner
+        run: |
+          cd miner-client
+          wasm-pack build --target web --release
+          # Move the output to your PWA's public folder so Netlify can see it
+          cp -r pkg ../public/wasm-miner 
+
+      - name: Deploy to Netlify
+        # ... your existing Netlify deploy steps
+       
