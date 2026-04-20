@@ -9,3 +9,13 @@ export const HabaRules = {
     return !HabaRules.forbiddenPatterns.some(pattern => pattern.test(text));
   }
 };
+async function sendMessage(text: string) {
+    if (!HabaRules.validate(text)) {
+        alert("Message contains restricted content. Keep the hustle clean!");
+        return;
+    }
+    
+    // If safe, encrypt and send to Matrix
+    await matrixClient.sendTextMessage(roomId, text);
+}
+
