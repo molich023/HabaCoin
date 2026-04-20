@@ -11,6 +11,15 @@
   path = "/api/mine"
   function = "mine-handler"
 
+  [[edge_functions]]
+  path = "/api/ghost-config"
+  function = "ghost-config"
+
+[[edge_functions]]
+  path = "/api/ghost-chat"
+  function = "matrix-bridge"
+  
+
 [functions]
   directory = "netlify/functions"
   
