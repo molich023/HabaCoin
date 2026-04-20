@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>HabaCoin Global</title>
     <link rel="manifest" href="/manifest.json">
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+    
     <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
     <style>
         body { background: #000; color: #fff; font-family: sans-serif; text-align: center; padding: 50px; }
@@ -15,6 +17,8 @@
     <h1>HabaCoin</h1>
     <p>100 Billion Supply | Global Mining | Private Chat</p>
     <div data-netlify-identity-menu></div>
+    <div class="cf-turnstile" data-sitekey="YOUR_SITE_KEY"></div>
+    
     <div data-netlify-identity-button></div>
 
     <script>
