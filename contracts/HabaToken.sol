@@ -1,14 +1,14 @@
+// habacoin/contracts/HabaToken.sol
 pragma solidity ^0.8.20;
 
-contract HabaToken is ERC20 {
-    uint256 public constant MAX_SUPPLY = 21000000 * 10**18;
-    uint256 public currentDifficulty = 0x0000FFFF...; // Starting difficulty
+import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
-    // Users call this with their Memory-Hard result
-    function mint(bytes32 nonce, bytes32 birthdayCollision) public {
-        require(verifyMomentum(msg.sender, nonce, birthdayCollision), "Invalid Work");
-        uint256 reward = calculateMiningReward(); 
-        _mint(msg.sender, reward);
-        adjustDifficulty(); // Bitcoin-style difficulty adjustment
+contract HabaToken is ERC20 {
+    uint256 public constant MAX_SUPPLY = 100_000_000_000 * 10**18;
+    
+    constructor() ERC20("HabaHaba", "HABA") {
+        // Initial mint to treasury for the 'Proof of Learning' pool
+        _mint(msg.sender, 5_000_000_000 * 10**18); // 5% Initial
     }
 }
+
