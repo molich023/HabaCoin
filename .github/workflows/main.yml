@@ -1,0 +1,10 @@
+name: HabaCoin Build
+on: [push]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: jetli/wasm-pack-action@v0.4.0 # Fastest WASM installer
+      - run: wasm-pack build miner-client --target web
+      # This ensures the .wasm file is ready for the PWA
