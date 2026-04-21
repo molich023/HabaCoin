@@ -1,14 +1,22 @@
-export const handler = async (event: any) => {
-  const { user } = JSON.parse(event.body);
+import { Handler } from '@netlify/functions';
 
-  // Auto-verify the user in Neon DB once they confirm email
-  await fetch(`${process.env.DATABASE_URL}/query`, {
-    method: "POST",
+export const handler: Handler = async (event) => {
+  const { user } = JSON.parse(event.body || '{}');
+
+  // When a user confirms email, we flip the 'is_verified' switch in Neon
+  const response = await fetch(`${process.env.DATABASE_URL}/query`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       query: "UPDATE profiles SET is_verified = TRUE WHERE id = $1",
       params: [user.id]
     })
   });
 
-  return { statusCode: 200 };
+  if (!response.ok) {
+    return { statusCode: 500, body: "Database sync failed" };
+  }
+
+  return { statusCode: 200, body: "User Verified" };
 };
+
