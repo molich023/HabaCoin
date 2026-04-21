@@ -22,4 +22,16 @@
 
 [functions]
   directory = "netlify/functions"
+
+  [[edge_functions]]
+  path = "/api/sync-assets"
+  function = "sync-assets"
+
+# Netlify Scheduled Functions (Beta) to run every hour
+[[plugins]]
+  package = "@netlify/plugin-emails" # Example plugin usage
+  
+[functions."sync-assets"]
+  schedule = "0 * * * *" # This runs the oracle at the top of every hour
+  
   
