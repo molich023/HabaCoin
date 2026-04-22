@@ -1,0 +1,43 @@
+import { useEffect, useState } from 'react';
+import { ethers } from 'ethers';
+
+// Your HABA Contract Details
+const HABA_ADDRESS = "0xYourContractAddressHere"; 
+const HABA_ABI = [
+  "event Transfer(address indexed from, address indexed to, uint256 value)"
+];
+
+export function useHabaLedger() {
+  const [transactions, setTransactions] = useState([]);
+
+  useEffect(() => {
+    // 1. Initialize dRPC Provider (Use your secure WSS link)
+    const provider = new ethers.WebSocketProvider(
+      `wss://lb.drpc.live/og/polygon/your-api-key`
+    );
+
+    const contract = new ethers.Contract(HABA_ADDRESS, HABA_ABI, provider);
+
+    // 2. The Listener
+    contract.on("Transfer", (from, to, value, event) => {
+      const newTx = {
+        id: event.log.transactionHash.substring(0, 8) + "...",
+        fullHash: event.log.transactionHash,
+        amount: parseFloat(ethers.formatUnits(value, 18)).toFixed(2),
+        time: "Just now",
+        type: from === ethers.ZeroAddress ? "Mining Reward" : "P2P Transfer"
+      };
+
+      // Keep only the last 10 transactions to save memory
+      setTransactions(prev => [newTx, ...prev].slice(0, 10));
+    });
+
+    // 3. Cleanup: Important for mobile performance!
+    return () => {
+      contract.removeAllListeners();
+      provider.destroy();
+    };
+  }, []);
+
+  return transactions;
+}
