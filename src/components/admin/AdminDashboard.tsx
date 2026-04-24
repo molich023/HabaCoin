@@ -21,7 +21,27 @@ export default function AdminDashboard() {
         </div>
       </div>
 
-      {/* Live Alerts Feed */}
+      useEffect(() => {
+  // Listen for the 'victory_ping' from Neon
+  const eventSource = new EventSource('/api/admin/realtime-alerts');
+  
+  eventSource.addEventListener('victory_ping', (e) => {
+    const data = JSON.parse(e.data);
+    
+    // 1. Play Victory Sound
+    const audio = new Audio('/assets/victory_ping.mp3');
+    audio.play();
+
+    // 2. Vibrate Phone (Special Pattern for 10km)
+    if (window.navigator.vibrate) {
+      window.navigator.vibrate([100, 30, 100, 30, 300]);
+    }
+
+    // 3. Show Alert
+    toast.success(`${data.message}: User covered ${data.distance}km!`);
+  });
+}, []);
+      
       <div className="bg-slate-900/50 rounded-[2.5rem] p-6 border border-white/5">
         <div className="flex justify-between items-center mb-6">
           <h3 className="text-white font-black uppercase italic flex items-center gap-2">
