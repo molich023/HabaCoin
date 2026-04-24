@@ -1,3 +1,34 @@
+import React, { useState, useEffect } from 'react'; // MUST add this
+import SecurityScanner from './components/SecurityScanner';
+import { useAuth } from './hooks/useAuth';
+
+export default function App() {
+  const { user, isAuthenticated, isLoading } = useAuth(); // Added isLoading
+  const [isSecure, setIsSecure] = useState(false);
+
+  // 1. Wait for Auth to finish loading
+  if (isLoading) return <div className="bg-black h-screen" />; 
+
+  // 2. Only show Scanner if Authenticated but not yet "Secured"
+  if (isAuthenticated && !isSecure) {
+    return (
+      <SecurityScanner 
+        gameName="HABA CORE SYSTEMS" 
+        onComplete={() => setIsSecure(true)} 
+      />
+    );
+  }
+
+  // 3. Show Login screen if not authenticated
+  if (!isAuthenticated) return <LoginScreen />;
+
+  return (
+    <main className={isSecure ? 'opacity-100' : 'opacity-0 transition-opacity duration-1000'}>
+       {/* Dashboard components here */}
+    </main>
+  );
+}
+
 import SecurityScanner from './components/SecurityScanner';
 import { useAuth } from './hooks/useAuth';
 
