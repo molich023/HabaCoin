@@ -61,7 +61,9 @@ export default function App() {
 }
 
 async function testDRPCConnection() {
-  const drpcUrl = "https://lb.drpc.live/polygon/YOUR_API_KEY"; // Replace with your real dRPC key
+  // Use the environment variable for safety
+  const apiKey = import.meta.env.VITE_DRPC_API_KEY; 
+  const drpcUrl = `https://lb.drpc.live/polygon/${apiKey}`; 
 
   try {
     const response = await fetch(drpcUrl, {
@@ -77,11 +79,20 @@ async function testDRPCConnection() {
 
     const data = await response.json();
     if (data.result) {
-      console.log("✅ Haba-Network Connected! Current Block:", parseInt(data.result, 16));
+      const blockNum = parseInt(data.result, 16);
+      console.log("✅ Haba-Network Connected! Block:", blockNum);
+      
+      // Update Neon DB with the last synced block for audit
+      await fetch('/api/admin/network-health', {
+        method: 'POST',
+        body: JSON.stringify({ block: blockNum, status: 'HEALTHY' })
+      });
+      
       return true;
     }
   } catch (error) {
-    console.error("❌ Connection failed:", error);
+    console.error("❌ Connection failed. Check your dRPC Dashboard.");
     return false;
   }
 }
+
