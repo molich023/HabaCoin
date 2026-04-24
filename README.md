@@ -13,4 +13,4 @@ proprietary **Synthetic Proof of Work (SPoW)** mechanism.
 ### Transparency
 All "Hustle Logs" are recorded on the Polygon Blockchain and verified 
 via our Hybrid Oracle system to ensure zero inflation and zero botting.
-
+Geospatial Utility: HABA uses real-time geofencing to incentivize "Green Behavior" where it matters most. By moving into Carbon Hotspots, users help stabilize local green grids and earn premium rewards. All location data is anonymized and verified via Environmental Cross-Referencing to ensure a fair and decentralized ecosystem.
