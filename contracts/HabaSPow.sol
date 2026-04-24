@@ -48,5 +48,13 @@ contract HabaSPow is ERC20, Ownable {
         _mint(msg.sender, reward);
         nodes[msg.sender].lastMiningTime = block.timestamp;
     }
+
+   mapping(address => bool) public isFoundingMember;
+
+   function mintFoundingBadge(address _hustler) external onlyOwner {
+       require(balanceOf(_hustler) > 0, "Must be an active hustler");
+       isFoundingMember[_hustler] = true;
+       // This unlocks the "Gold Shield" UI and "Whale Chat" forever
+}
 }
 
