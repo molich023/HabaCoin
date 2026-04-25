@@ -3,10 +3,6 @@
   command = "curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh && wasm-pack build miner-client --target web --out-dir ../public/wasm && npm run build"
   publish = "public"
 
-  [build]
-  command = "npm run build"
-  publish = "dist" # Or "public" depending on your framework
-
 [build.environment]
   NODE_VERSION = "20"
 
