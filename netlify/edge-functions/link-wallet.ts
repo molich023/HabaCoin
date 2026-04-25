@@ -1,9 +1,21 @@
 import { Context } from "@netlify/edge-functions";
 import { ethers } from "https://esm.sh/ethers@6.7.0";
 
-// The "Default Export" is mandatory for Edge Functions
 export default async (request: Request, context: Context) => {
-  try {
+  // 1. link-wallet: Block common bot headers and headless browsers
+  const ua = request.headers.get("user-agent") || "";
+  const secMetadata = request.headers.get("sec-fetch-dest");
+  
+  const isBot = /bot|spider|crawl|headless|puppeteer/i.test(ua);
+  
+  // High-security check: Only allow requests originating from 'document' or 'empty' (fetch)
+  if (isBot || (secMetadata && !['document', 'empty'].includes(secMetadata))) {
+    return new Response(JSON.stringify({ error: "link-wallet: Unauthorized" }), {
+      status: 403,
+      headers: { "Content-Type": "application/json" }
+    });
+  }
+
   if (request.method !== "POST") return new Response("Method not allowed", { status: 405 });
 
   const { walletAddress, signature, message, captchaToken } = await request.json();
