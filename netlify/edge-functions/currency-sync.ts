@@ -1,4 +1,8 @@
-export default async () => {
+import { Context } from "@netlify/edge-functions";
+
+// The "Default Export" is mandatory for Edge Functions
+export default async (request: Request, context: Context) => {
+  try {
   // Fetch rates for our top 5 global hustle regions
   const res = await fetch(`https://api.freecurrencyapi.com/v1/latest?apikey=YOUR_KEY&currencies=NGN,INR,BRL,EUR,ZAR`);
   const { data } = await res.json();
