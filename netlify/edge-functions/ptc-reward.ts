@@ -1,6 +1,8 @@
-import { Context } from "https://edge.netlify.com";
+import { Context } from "@netlify/edge-functions";
 
+// The "Default Export" is mandatory for Edge Functions
 export default async (request: Request, context: Context) => {
+  try {
   const { reward } = await request.json();
   const user = context.app.identity?.user;
 
