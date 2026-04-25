@@ -1,7 +1,8 @@
-import { Context } from "https://edge.netlify.com";
+import { Context } from "@netlify/edge-functions";
 
+// The "Default Export" is mandatory for Edge Functions
 export default async (request: Request, context: Context) => {
-  const url = new URL(request.url);
+  try {
   
   // Check if user is logged in via Netlify Identity
   const user = context.app.identity?.user;
