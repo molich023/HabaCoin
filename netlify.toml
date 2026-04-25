@@ -1,22 +1,13 @@
 [build]
-  # Combined command: build WASM first, then the PWA
-  command = "wasm-pack build miner-client --target web --out-dir ../public/wasm && npm run build"
+  # We leave this empty or use a simple command because GitHub Actions handles the build
+  command = "npm run build"
   publish = "dist"
-
-[build.environment]
-  NODE_VERSION = "20"
-  # This tells Netlify where to find the Rust toolchain if needed
-  RUST_VERSION = "stable"
 
 [[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200
-
-# Edge Functions for your 'Ghost Oracle' security checks
-[[edge_functions]]
-  path = "/api/*"
-  function = "security-gate"
+  
 
   
     
