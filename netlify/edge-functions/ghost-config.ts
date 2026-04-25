@@ -1,17 +1,36 @@
 import { Context } from "@netlify/edge-functions";
 
-// The "Default Export" is mandatory for Edge Functions
+/**
+ * Ghost Oracle: Secure Config Gate
+ * Uses 'export default' to satisfy Netlify's Edge API requirements.
+ */
 export default async (request: Request, context: Context) => {
-  try {
-  // This file defines the "Stealth" rules for the Matrix chat
-  const GHOST_SETTINGS = {
-    burnRate: 0.02,           // The 2% Ghost Tax
-    encryption: "AES-256-GCM",
-    sessionTimeout: "1h",     // Messages vanish from RAM after 1 hour
-    minKarma: 50              // Minimum Karma needed to enter Ghost Chat
+  // 1. Ghost Security Check: Detect if the request is from a known bot/emulator
+  const userAgent = request.headers.get("user-agent") || "";
+  const isSuspicious = userAgent.includes("Headless") || userAgent.includes("Puppeteer");
+
+  if (isSuspicious) {
+    return new Response(JSON.stringify({ error: "Ghost Protocol: Access Denied" }), {
+      status: 403,
+      headers: { "Content-Type": "application/json" }
+    });
+  }
+
+  // 2. Return Secure Config
+  const config = {
+    haba_node_url: Deno.env.get("POLYGON_RPC_URL"),
+    oracle_v: "1.0.4-monstrous",
+    mesh_sync_enabled: true
   };
 
-  return new Response(JSON.stringify(GHOST_SETTINGS), {
-    headers: { "Content-Type": "application/json" }
+  return new Response(JSON.stringify(config), {
+    status: 200,
+    headers: { 
+      "Content-Type": "application/json",
+      "X-Haba-Signature": "ghost_verified" 
+    }
   });
 };
+
+// Configuration for Netlify routing
+export const config = { path: "/api/ghost-config" };
