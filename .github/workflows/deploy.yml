@@ -1,17 +1,43 @@
+name: Haba Monstrous Deploy
 
-       steps:
-      - uses: actions/checkout@v3
-      
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build-wasm:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust Toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
+
       - name: Install wasm-pack
         run: curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
 
       - name: Build WASM Miner
         run: |
-          cd miner-client
-          wasm-pack build --target web --release
-          # Move the output to your PWA's public folder so Netlify can see it
-          cp -r pkg ../public/wasm-miner 
+          mkdir -p public/wasm
+          wasm-pack build miner-client --target web --out-dir ../public/wasm
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install Dependencies & Build PWA
+        run: |
+          npm install
+          npm run build
 
       - name: Deploy to Netlify
-        # ... your existing Netlify deploy steps
-       
+        uses: netlify/actions/cli@master
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+        with:
+          args: deploy --dir=dist --prod
