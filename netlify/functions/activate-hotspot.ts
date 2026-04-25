@@ -1,4 +1,4 @@
-import { io } from "../../lib/socket-server"; // Our real-time engine
+import { socket } from "./lib/socket-server" 
 
 export async function handler(event) {
   const { name, multiplier, duration } = JSON.parse(event.body);
