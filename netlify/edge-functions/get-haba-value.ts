@@ -1,6 +1,8 @@
-import { Context } from "https://edge.netlify.com";
+import { Context } from "@netlify/edge-functions";
 
+// The "Default Export" is mandatory for Edge Functions
 export default async (request: Request, context: Context) => {
+  try {
   // 1. DATA SOURCES
   // We fetch standard crypto, then layer in our 'Kenya-Strength' renewable data
   const btcPrice = 77500; // Live BTC
