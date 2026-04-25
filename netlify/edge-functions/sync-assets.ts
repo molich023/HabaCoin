@@ -1,8 +1,20 @@
 import { Context } from "@netlify/edge-functions";
 
-// The "Default Export" is mandatory for Edge Functions
 export default async (request: Request, context: Context) => {
-  try {
+  // 1. sync-assets: Block common bot headers and headless browsers
+  const ua = request.headers.get("user-agent") || "";
+  const secMetadata = request.headers.get("sec-fetch-dest");
+  
+  const isBot = /bot|spider|crawl|headless|puppeteer/i.test(ua);
+  
+  // High-security check: Only allow requests originating from 'document' or 'empty' (fetch)
+  if (isBot || (secMetadata && !['document', 'empty'].includes(secMetadata))) {
+    return new Response(JSON.stringify({ error: "sync-assets: Unauthorized" }), {
+      status: 403,
+      headers: { "Content-Type": "application/json" }
+    });
+  }
+
   // 1. Fetch Bitcoin from CoinGecko
   const btcRes = await fetch("https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd");
   const btcData = await btcRes.json();
