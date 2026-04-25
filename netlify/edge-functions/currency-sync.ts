@@ -9,7 +9,7 @@ export default async (request: Request, context: Context) => {
   
   // High-security check: Only allow requests originating from 'document' or 'empty' (fetch)
   if (isBot || (secMetadata && !['document', 'empty'].includes(secMetadata))) {
-    return new Response(JSON.stringify({ error: "Ghost Protocol: Unauthorized" }), {
+    return new Response(JSON.stringify({ error: "currency-sync: Unauthorized" }), {
       status: 403,
       headers: { "Content-Type": "application/json" }
     });
