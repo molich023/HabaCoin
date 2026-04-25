@@ -40,4 +40,8 @@
     Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline' https://challenges.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https://*.tile.openstreetmap.org;"
     X-Content-Type-Options = "nosniff"
     X-Frame-Options = "DENY"
+
+    [build]
+  command = "wasm-pack build miner-client --target web --out-dir ../public/wasm && npm run build"
+  
     
