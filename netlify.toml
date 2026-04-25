@@ -1,56 +1,22 @@
-
-  [build]
-  command = "curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh && wasm-pack build miner-client --target web --out-dir ../public/wasm && npm run build"
-  publish = "public"
+[build]
+  # Combined command: build WASM first, then the PWA
+  command = "wasm-pack build miner-client --target web --out-dir ../public/wasm && npm run build"
+  publish = "dist"
 
 [build.environment]
   NODE_VERSION = "20"
+  # This tells Netlify where to find the Rust toolchain if needed
+  RUST_VERSION = "stable"
 
 [[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200
-  
 
+# Edge Functions for your 'Ghost Oracle' security checks
 [[edge_functions]]
-  path = "/api/link-wallet"
-  function = "link-wallet"
+  path = "/api/*"
+  function = "security-gate"
 
-[[edge_functions]]
-  path = "/api/mine"
-  function = "mine-handler"
-
-  [[edge_functions]]
-  path = "/api/ghost-config"
-  function = "ghost-config"
-
-[[edge_functions]]
-  path = "/api/ghost-chat"
-  function = "matrix-bridge"
-  
-
-[functions]
-  directory = "netlify/functions"
-
-  [[edge_functions]]
-  path = "/api/sync-assets"
-  function = "sync-assets"
-
-# Netlify Scheduled Functions (Beta) to run every hour
-[[plugins]]
-  package = "@netlify/plugin-emails" # Example plugin usage
-  
-[functions."sync-assets"]
-  schedule = "0 * * * *" # This runs the oracle at the top of every hour
-  
- [[headers]]
-  for = "/*"
-  [headers.values]
-    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline' https://challenges.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https://*.tile.openstreetmap.org;"
-    X-Content-Type-Options = "nosniff"
-    X-Frame-Options = "DENY"
-
-    [build]
-  command = "wasm-pack build miner-client --target web --out-dir ../public/wasm && npm run build"
   
     
