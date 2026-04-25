@@ -1,6 +1,8 @@
-import { Context } from "https://edge.netlify.com";
+import { Context } from "@netlify/edge-functions";
 
+// The "Default Export" is mandatory for Edge Functions
 export default async (request: Request, context: Context) => {
+  try {
   // 1. Fetch Bitcoin from CoinGecko
   const btcRes = await fetch("https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd");
   const btcData = await btcRes.json();
