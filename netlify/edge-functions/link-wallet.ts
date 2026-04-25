@@ -1,7 +1,9 @@
-import { Context } from "https://edge.netlify.com";
+import { Context } from "@netlify/edge-functions";
 import { ethers } from "https://esm.sh/ethers@6.7.0";
 
+// The "Default Export" is mandatory for Edge Functions
 export default async (request: Request, context: Context) => {
+  try {
   if (request.method !== "POST") return new Response("Method not allowed", { status: 405 });
 
   const { walletAddress, signature, message, captchaToken } = await request.json();
