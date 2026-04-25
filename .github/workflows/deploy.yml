@@ -1,11 +1,11 @@
-name: Haba Monstrous Deploy
+name: Haba Main Build
 
 on:
   push:
     branches: [ main ]
 
 jobs:
-  build-wasm:
+  build-and-deploy:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -18,20 +18,20 @@ jobs:
       - name: Install wasm-pack
         run: curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
 
-      - name: Build WASM Miner
+      - name: Build WASM
+        # This compiles the Rust code into WebAssembly
         run: |
           mkdir -p public/wasm
           wasm-pack build miner-client --target web --out-dir ../public/wasm
 
-      - name: Setup Node.js
+      - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: 'npm'
 
-      - name: Install Dependencies & Build PWA
+      - name: Install & Build Frontend
         run: |
-          npm install
+          npm ci
           npm run build
 
       - name: Deploy to Netlify
@@ -41,3 +41,4 @@ jobs:
           NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
         with:
           args: deploy --dir=dist --prod
+          
