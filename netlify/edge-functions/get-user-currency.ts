@@ -1,6 +1,8 @@
-import { Context } from "https://edge.netlify.com";
+import { Context } from "@netlify/edge-functions";
 
+// The "Default Export" is mandatory for Edge Functions
 export default async (request: Request, context: Context) => {
+  try {
   // 1. Auto-detect user currency from GeoIP (Netlify built-in)
   const localCurrency = context.geo?.currency || "USD";
   
