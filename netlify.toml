@@ -3,6 +3,14 @@
   command = "npm run build"
   publish = "dist"
 
+  [[edge_functions]]
+  path = "/api/resolve-game"
+  function = "resolve-game"
+
+[[edge_functions]]
+  path = "/api/ghost-config"
+  function = "ghost-config"
+
 [[redirects]]
   from = "/*"
   to = "/index.html"
