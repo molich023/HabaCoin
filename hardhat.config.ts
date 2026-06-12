@@ -5,14 +5,23 @@ import * as dotenv from "dotenv";
 dotenv.config();
 
 const config: HardhatUserConfig = {
-  solidity: "0.8.20",
+  solidity: {
+    version: "0.8.20",
+    settings: {
+      optimizer: {
+        enabled: true,
+        runs: 200, // Maximizes execution efficiency and drops on-chain gas deployment costs
+      },
+    },
+  },
   networks: {
     polygon: {
-      // Use your dRPC HTTPS link here
-      url: process.env.DRPC_POLYGON_URL || "",
-      accounts: [process.env.PRIVATE_KEY || ""],
+      // High-performance dRPC infrastructure endpoint link configuration
+      url: process.env.DRPC_POLYGON_URL || "https://polygon.drpc.org",
+      accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
     },
   },
 };
 
 export default config;
+
