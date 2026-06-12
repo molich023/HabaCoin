@@ -1,0 +1,24 @@
+[package]
+name = "habacoin-miner-client"
+version = "1.0.0"
+edition = "2021"
+authors = ["HabaCoin Engineering Team"]
+description = "Hardened WebAssembly sPoW cryptographic core module for HabaCoin."
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+wasm-bindgen = "0.2"
+sha3 = "0.10"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+serde-wasm-bindgen = "0.4"
+getrandom = { version = "0.2", features = ["js"] }
+js-sys = "0.3"
+
+[profile.release]
+opt-level = "z"
+lto = true
+codegen-units = 1
+panic = "abort"
