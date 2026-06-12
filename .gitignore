@@ -1,5 +1,6 @@
 # --- Node / PWA ---
 node_modules/
+backend/node_modules/
 dist/
 build/
 .env
@@ -10,10 +11,11 @@ yarn-debug.log*
 yarn-error.log*
 
 # --- Rust / WASM ---
-# We ignore the 'target' folder because it's massive.
-# BUT we make sure to keep the built WASM in public/
+# We ignore the cargo target artifacts because they are massive.
+# BUT we explicitly unignore the compiled browser-ready public targets.
 miner-client/target/
 pkg/
+!public/wasm/
 
 # --- Hardhat / Smart Contracts ---
 artifacts/
@@ -24,9 +26,10 @@ coverage.json
 *.db
 *.sqlite
 
-# --- OS / Mobile ---
+# --- OS / Mobile / Sandboxes ---
 .DS_Store
 .userland_history
 .bash_history
 thumbs.db
+
 
