@@ -1,20 +1,31 @@
 {
-  "name": "HabaCoin Global",
-  "short_name": "Habacoin",
-  "start_url": "/",
+  "name": "HabaCoin Global Protocol",
+  "short_name": "HabaCoin",
+  "description": "Decentralized global activity asset distribution rail built over multi-asset index backing.",
+  "start_url": "/?utm_source=pwa",
   "display": "standalone",
+  "orientation": "portrait-primary",
   "background_color": "#27ae60",
   "theme_color": "#27ae60",
+  "prefer_related_applications": false,
   "icons": [
     {
       "src": "/icons/icon-192.png",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
     },
     {
       "src": "/icons/icon-512.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any"
     }
   ]
 }
