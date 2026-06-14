@@ -1,4 +1,4 @@
-# HabaCoin (HABA)
+HabaCoin (HABA)
 
 > A High-Performance, Mobile-First Web3 Ecosystem Driving Financial Inclusion and Micro-Transactions across Africa.
 
