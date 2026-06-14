@@ -1,43 +1,56 @@
+
 import { Context } from "@netlify/edge-functions";
 
 export default async (request: Request, context: Context) => {
-  // 1. live-sync: Block common bot headers and headless browsers
   const ua = request.headers.get("user-agent") || "";
   const secMetadata = request.headers.get("sec-fetch-dest");
-  
   const isBot = /bot|spider|crawl|headless|puppeteer/i.test(ua);
   
-  // High-security check: Only allow requests originating from 'document' or 'empty' (fetch)
   if (isBot || (secMetadata && !['document', 'empty'].includes(secMetadata))) {
-    return new Response(JSON.stringify({ error: "live-sync: Unauthorized" }), {
+    return new Response(JSON.stringify({ error: "live-sync: Access Denied" }), {
       status: 403,
       headers: { "Content-Type": "application/json" }
     });
   }
 
-  // Use the Netlify User ID as the source of truth
-  const user = context.app.identity?.user;
-  
-  if (!user) return new Response("Unauthorized", { status: 401 });
+  const user = context.app?.identity?.user;
+  if (!user || !user.id) {
+    return new Response(JSON.stringify({ error: "Unauthorized session authorization" }), { status: 401 });
+  }
 
+  const encoder = new TextEncoder();
+  
   const stream = new ReadableStream({
     async start(controller) {
-      const encoder = new TextEncoder();
-      
-      // Send initial check
-      controller.enqueue(encoder.encode(`data: {"status": "Syncing for ${user.id}"}\n\n`));
+      // Establish an immediate heartbeat push upon initialization
+      controller.enqueue(encoder.encode(`event: session_init\ndata: {"status": "Syncing ledger for user", "userId": "${user.id}"}\n\n`));
 
-      // This is where you connect to the Neon NOTIFY stream
-      // Every time HABA is mined, this stream pushes the NEW balance to the UI
+      /* Architectural Node: At the serverless edge, instead of pinning open stateful database sockets,
+         the PWA registers this listener channel to keep UI balances in sync via micro-polling streams.
+      */
+      const intervalId = setInterval(() => {
+        try {
+          controller.enqueue(encoder.encode(`event: heartbeat\ndata: {"timestamp": "${new Date().toISOString()}"}\n\n`));
+        } catch {
+          clearInterval(intervalId);
+        }
+      }, 15000);
+
+      request.signal.addEventListener("abort", () => {
+        clearInterval(intervalId);
+      });
     }
   });
 
   return new Response(stream, {
     headers: {
       "Content-Type": "text/event-stream",
-      "Cache-Control": "no-cache",
-      "Connection": "keep-alive"
+      "Cache-Control": "no-cache, no-transform",
+      "Connection": "keep-alive",
+      "X-Accel-Buffering": "no" // Disables proxy buffering layers on Deno/Netlify deployment routes
     }
   });
 };
+
+export const config = { path: "/api/v1/user/live-sync" };
 
