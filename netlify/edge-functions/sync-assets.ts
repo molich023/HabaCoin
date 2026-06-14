@@ -1,47 +1,52 @@
 import { Context } from "@netlify/edge-functions";
+import { neon } from "https://esm.sh/@neondatabase/serverless@0.9.0";
+
+const COINGECKO_INDEX_FEED = "https://api.coingecko.com/api/v3/simple/price?ids=wrapped-bitcoin,ethereum,tether,klima-dao&vs_currencies=usd";
 
 export default async (request: Request, context: Context) => {
-  // 1. sync-assets: Block common bot headers and headless browsers
   const ua = request.headers.get("user-agent") || "";
   const secMetadata = request.headers.get("sec-fetch-dest");
-  
   const isBot = /bot|spider|crawl|headless|puppeteer/i.test(ua);
   
-  // High-security check: Only allow requests originating from 'document' or 'empty' (fetch)
   if (isBot || (secMetadata && !['document', 'empty'].includes(secMetadata))) {
-    return new Response(JSON.stringify({ error: "sync-assets: Unauthorized" }), {
-      status: 403,
+    return new Response(JSON.stringify({ error: "sync-assets: Access Denied" }), { status: 403 });
+  }
+
+  try {
+    const response = await fetch(COINGECKO_INDEX_FEED);
+    if (!response.ok) throw new Error("External multi-asset marketplace oracle offline.");
+    
+    const marketData = await response.json();
+
+    const updates = [
+      { name: 'wrapped-bitcoin', price: marketData["wrapped-bitcoin"].usd },
+      { name: 'ethereum', price: marketData["ethereum"].usd },
+      { name: 'tether', price: marketData["tether"].usd },
+      { name: 'klima-dao', price: marketData["klima-dao"].usd } // 10% On-Chain Green Asset Allocation
+    ];
+
+    const databaseUrl = Deno.env.get("DATABASE_URL");
+    if (!databaseUrl) throw new Error("Missing system DATABASE_URL strings.");
+    const sql = neon(databaseUrl);
+
+    for (const asset of updates) {
+      await sql`
+        INSERT INTO asset_prices (asset_name, price_usd, last_updated)
+        VALUES (${asset.name}, ${parseFloat(asset.price)}, NOW())
+        ON CONFLICT (asset_name) 
+        DO UPDATE SET price_usd = EXCLUDED.price_usd, last_updated = NOW();
+      `;
+    }
+
+    return new Response(JSON.stringify({ success: true, message: "Haba Backing Reserve Index Synced." }), {
+      status: 200,
       headers: { "Content-Type": "application/json" }
     });
+
+  } catch (error: any) {
+    console.error("[!] Reserve Oracle Synchronization Error:", error.message);
+    return new Response(JSON.stringify({ error: "Failed to pull current index backing calculations." }), { status: 500 });
   }
-
-  // 1. Fetch Bitcoin from CoinGecko
-  const btcRes = await fetch("https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd");
-  const btcData = await btcRes.json();
-
-  // 2. Fetch Gold & Uranium from Metals-API (Using your free API Key)
-  const METALS_KEY = Deno.env.get("METALS_API_KEY");
-  const metalsRes = await fetch(`https://metals-api.com/api/latest?access_key=${METALS_KEY}&base=USD&symbols=XAU,XAG,URANIUM`);
-  const metalsData = await metalsRes.json();
-
-  // 3. Connect to Neon DB
-  const DATABASE_URL = Deno.env.get("DATABASE_URL");
-  
-  const updates = [
-    { name: 'bitcoin', price: btcData.bitcoin.usd },
-    { name: 'gold', price: 1 / metalsData.rates.XAU }, // Convert rate to USD
-    { name: 'uranium', price: 1 / metalsData.rates.URANIUM }
-  ];
-
-  for (const asset of updates) {
-    await fetch(`${DATABASE_URL}/query`, {
-      method: "POST",
-      body: JSON.stringify({
-        query: "UPDATE asset_prices SET price_usd = $1, last_updated = now() WHERE asset_name = $2",
-        params: [asset.price, asset.name]
-      })
-    });
-  }
-
-  return new Response("Haba Oracle: Assets Synchronized.", { status: 200 });
 };
+
+export const config = { path: "/api/v1/oracle/sync-assets" };
