@@ -38,6 +38,6 @@ HabaCoin moves away from resource-intensive hardware mining. Instead, users part
 ### Local Configuration
 1. Clone the project and install project dependencies:
 ```bash
-   git clone [https://github.com/your-repo/habacoin.git](https://github.com/your-repo/habacoin.git)
+   git clone [https://github.com/molich023/habacoin.git](https://github.com/molich023/habacoin.git)
    cd habacoin
    npm install
