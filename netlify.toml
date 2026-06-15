@@ -3,25 +3,39 @@
   publish = "dist"
 
 [[edge_functions]]
-  path = "/api/resolve-game"
-  function = "resolve-game"
+  function = "haba-handler"
+  path = "/api/profile"
 
 [[edge_functions]]
-  path = "/api/ghost-config"
-  function = "ghost-config"
+  function = "get-user-currency"
+  path = "/api/v1/user/currency"
 
-# CRITICAL AUTOMATION: API Route Proxy Mirror
-# Redirects all frontend network API dispatches safely to our core backend engine clusters
-[[redirects]]
-  from = "/api/*"
-  to = "http://localhost:3000/api/:splat"
-  status = 200
-  force = true
+[[edge_functions]]
+  function = "link-wallet"
+  path = "/api/v1/user/link-wallet"
 
+[[edge_functions]]
+  function = "verify-spow"
+  path = "/api/v1/mining/verify-spow"
+
+[[edge_functions]]
+  function = "verify-trip"
+  path = "/api/v1/telemetry/verify-trip"
+
+[[edge_functions]]
+  function = "live-sync"
+  path = "/api/v1/user/live-sync"
+
+[[edge_functions]]
+  function = "p2p-lookup"
+  path = "/api/v1/p2p/contact-lookup"
+
+# Catch-all rule redirecting standard client routes back into the main single page PWA window context
 [[redirects]]
   from = "/*"
-  to = "/index.html"
   status = 200
+  to = "/index.html"
+  
   
   
 
