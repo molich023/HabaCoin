@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /$
+Allow: /index.html
+Disallow: /api/
+Disallow: /chat-room
+Disallow: /wasm/
