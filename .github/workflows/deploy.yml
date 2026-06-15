@@ -1,0 +1,54 @@
+name: HabaCoin Production Protocol Build
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Optimized Rust Toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
+
+      # Uses high-speed caching for wasm-pack to prevent downloading installer scripts on every run
+      - name: Install wasm-pack Tooling
+        uses: jetli/wasm-pack-action@v0.4.0
+
+      - name: Compile Core WebAssembly Miner Client
+        run: |
+          mkdir -p public/wasm
+          wasm-pack build miner-client --target web --out-dir ../public/wasm
+
+      - name: Setup NodeJS Environment
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm' # Speeds up node_modules installation parameters
+
+      - name: Install Project Dependencies & Build App Package
+        run: |
+          npm ci
+          npm run build
+
+      - name: Restrictive Build Directory Audit Check
+        # Safeguards against missing output maps during edge deployment runs
+        run: |
+          if [ ! -d "dist" ]; then
+            echo "[-] Error: 'dist' deployment path target not found. Checking fallback alternatives."
+            exit 1
+          fi
+
+      - name: Deploy Production Release to Netlify Edge
+        uses: netlify/actions/cli@master
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+        with:
+          args: deploy --dir=dist --prod
+          
