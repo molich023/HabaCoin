@@ -1,0 +1,6 @@
+/*
+  X-Frame-Options: DENY
+  X-Content-Type-Options: nosniff
+  X-XSS-Protection: 1; mode=block
+  Content-Security-Policy: default-src 'self'; script-src 'self' https://unpkg.com https://challenges.cloudflare.com; style-src 'self' 'unsafe-inline'; connect-src 'self' https://api.coingecko.com https://matrix.org *.neon.tech; img-src 'self' data:; frame-src https://challenges.cloudflare.com;
+  Permissions-Policy: geolocation=(self), accelerometer=(), gyroscope=(), magnetometer=()
