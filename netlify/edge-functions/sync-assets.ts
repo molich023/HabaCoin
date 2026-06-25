@@ -18,27 +18,37 @@ export default async (request: Request, context: Context) => {
     
     const marketData = await response.json();
 
+    // The core 4-asset basket portfolio split matching treasury parameters
     const updates = [
-      { name: 'wrapped-bitcoin', price: marketData["wrapped-bitcoin"].usd },
-      { name: 'ethereum', price: marketData["ethereum"].usd },
-      { name: 'tether', price: marketData["tether"].usd },
-      { name: 'klima-dao', price: marketData["klima-dao"].usd } // 10% On-Chain Green Asset Allocation
+      { name: 'wrapped-bitcoin', price: marketData["wrapped-bitcoin"].usd, weight: 0.50 },
+      { name: 'ethereum', price: marketData["ethereum"].usd, weight: 0.25 },
+      { name: 'tether', price: marketData["tether"].usd, weight: 0.15 },
+      { name: 'klima-dao', price: marketData["klima-dao"].usd, weight: 0.10 }
     ];
 
     const databaseUrl = Deno.env.get("DATABASE_URL");
     if (!databaseUrl) throw new Error("Missing system DATABASE_URL strings.");
     const sql = neon(databaseUrl);
 
+    let intrinsicHabaBasketValue = 0;
+
     for (const asset of updates) {
+      const assetPrice = parseFloat(asset.price);
+      intrinsicHabaBasketValue += assetPrice * asset.weight;
+
       await sql`
-        INSERT INTO asset_prices (asset_name, price_usd, last_updated)
-        VALUES (${asset.name}, ${parseFloat(asset.price)}, NOW())
+        INSERT INTO asset_prices (asset_name, price_usd, target_weight, last_updated)
+        VALUES (${asset.name}, ${assetPrice}, ${asset.weight}, NOW())
         ON CONFLICT (asset_name) 
-        DO UPDATE SET price_usd = EXCLUDED.price_usd, last_updated = NOW();
+        DO UPDATE SET price_usd = EXCLUDED.price_usd, target_weight = EXCLUDED.target_weight, last_updated = NOW();
       `;
     }
 
-    return new Response(JSON.stringify({ success: true, message: "Haba Backing Reserve Index Synced." }), {
+    return new Response(JSON.stringify({ 
+      success: true, 
+      message: "Haba Backing Reserve Index Synced.",
+      calculated_basket_intrinsic_value: intrinsicHabaBasketValue
+    }), {
       status: 200,
       headers: { "Content-Type": "application/json" }
     });

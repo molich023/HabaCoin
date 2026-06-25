@@ -1,0 +1,7 @@
+# Block AI scraping and indexing of your sensitive protocol keys
+.env
+secret.json
+*.key
+artifacts/
+cache/
+node_modules/

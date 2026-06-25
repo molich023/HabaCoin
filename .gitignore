@@ -33,3 +33,9 @@ coverage.json
 thumbs.db
 
 
+.env
+secret.json
+*.key
+artifacts
+cache
+node_modules
