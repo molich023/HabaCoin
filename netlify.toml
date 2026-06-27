@@ -2,42 +2,7 @@
   command = "npm run build"
   publish = "dist"
 
-[[edge_functions]]
-  function = "haba-handler"
-  path = "/api/profile"
-
-[[edge_functions]]
-  function = "get-user-currency"
-  path = "/api/v1/user/currency"
-
-[[edge_functions]]
-  function = "link-wallet"
-  path = "/api/v1/user/link-wallet"
-
-[[edge_functions]]
-  function = "verify-spow"
-  path = "/api/v1/mining/verify-spow"
-
-[[edge_functions]]
-  function = "verify-trip"
-  path = "/api/v1/telemetry/verify-trip"
-
-[[edge_functions]]
-  function = "live-sync"
-  path = "/api/v1/user/live-sync"
-
-[[edge_functions]]
-  function = "p2p-lookup"
-  path = "/api/v1/p2p/contact-lookup"
-
-# Catch-all rule redirecting standard client routes back into the main single page PWA window context
 [[redirects]]
   from = "/*"
-  status = 200
   to = "/index.html"
-  
-  
-  
-
-  
-    
+  status = 200
