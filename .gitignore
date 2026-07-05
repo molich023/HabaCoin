@@ -39,3 +39,14 @@ secret.json
 artifacts
 cache
 node_modules
+
+# 🛡️ HabaCoin Strict Production Credentials Guard
+.env
+.env.local
+.env.*.local
+node_modules/
+.next/
+dist/
+build/
+*.log
+.env.save

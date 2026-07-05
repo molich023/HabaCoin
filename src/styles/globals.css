@@ -1,0 +1,11 @@
+
+/* ====================================================================
+ * 🛡️ OWASP NAIROBI COMPLIANCE: TAPJACKING & OVERLAY MITIGATION SHIELD
+ * ==================================================================== */
+.secure-touch-surface {
+  pointer-events: auto !important;
+  isolation: isolate;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  user-select: none;
+}

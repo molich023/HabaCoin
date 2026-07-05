@@ -7,7 +7,10 @@
   "orientation": "portrait-primary",
   "background_color": "#27ae60",
   "theme_color": "#27ae60",
+  "categories": ["finance", "utilities"],
   "prefer_related_applications": false,
+  "dir": "ltr",
+  "lang": "en-US",
   "icons": [
     {
       "src": "/icons/icon-192.png",
