@@ -1,3 +1,7 @@
+import { enforceAntiDebuggingMatrix } from "./anti-debug-shield";
+// Invoke at the immediate entry point of your handler:
+// enforceAntiDebuggingMatrix();
+
 import type { NextApiRequest, NextApiResponse } from "next";
 import { verifySolution } from "altcha-lib";
 

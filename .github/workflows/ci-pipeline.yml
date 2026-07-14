@@ -1,0 +1,42 @@
+name: HabaCoin Automated FLOSS Core Assurance Pipeline
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  verify-application:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fetch Current Git Version Snapshot
+        uses: actions/checkout@v4
+
+      - name: Instantiate Node.js High-Availability Runtime
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Verify Open-Source Dependency Graph
+        run: npm ci
+
+      - name: Run Complete Functional Test Matrix
+        run: npm run test
+
+  codeql-audit:
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+    steps:
+      - name: Fetch Current Workspace Tree
+        uses: actions/checkout@v4
+
+      - name: Initialize CodeQL Security Scanning Engine
+        uses: github/codeql-action/init@v3
+        with:
+          languages: 'javascript, typescript'
+
+      - name: Execute Live Vulnerability Scan
+        uses: github/codeql-action/analyze@v3

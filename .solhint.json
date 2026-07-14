@@ -1,0 +1,13 @@
+{
+  "extends": "solhint:recommended",
+  "rules": {
+    "compiler-version": ["error", "^0.8.20"],
+    "no-complex-fallback": "error",
+    "reentrancy": "error",
+    "state-visibility": "error",
+    "avoid-sha3": "warn",
+    "avoid-suicide": "error",
+    "avoid-throw": "error",
+    "func-visibility": ["warn", { "ignoreConstructors": true }]
+  }
+}

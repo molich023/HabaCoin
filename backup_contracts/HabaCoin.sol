@@ -1,18 +1,17 @@
 // SPDX-License-Identifier: MIT
-pragma solidity >=0.8.20 <0.9.0;
+pragma solidity 0.8.26;
 
-import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
-import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
-import {ReentrancyGuard} from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
+import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 
 /**
  * @title HabaCoin
- * @author HabaCoin Core Dev Team
- * @notice Production ledger token asset designed with a 1 Trillion Total Supply for Kenyan micropayment operations.
  * @dev Highly optimized, secure ERC20 token ledger with 1 Trillion Total Supply.
  */
 contract HabaCoin is ERC20, Ownable, ReentrancyGuard {
     
+    // 🛡️ GAS OPTIMIZATION: Custom Errors replace expensive string-based require statements
     error ZeroAddressDetected();
     error ZeroAmountDetected();
 
@@ -24,9 +23,7 @@ contract HabaCoin is ERC20, Ownable, ReentrancyGuard {
 
     mapping(address => RewardLedger) private _rewards;
     
-    /**
-     * @notice The constant total token supply caps out at exactly 1 Trillion units (scaled by 18 decimals)
-     */
+    // Total Supply: 1,000,000,000,000 (1 Trillion) tokens with 18 decimal places
     uint256 public constant INITIAL_SUPPLY = 1_000_000_000_000 * 10**18;
 
     constructor() ERC20("HabaCoin", "HABA") Ownable(msg.sender) {
@@ -43,10 +40,7 @@ contract HabaCoin is ERC20, Ownable, ReentrancyGuard {
     }
 
     /**
-     * @notice Execute batch allocations of reward balances to a list of recipients
      * @dev Process batch allocations gas-efficiently using optimized loop structures
-     * @param recipients Array of user target addresses to receive the allocations
-     * @param allocationAmount The precise atomic uint128 value distributed to each recipient
      */
     function processBatchAllocation(address[] calldata recipients, uint128 allocationAmount) 
         external 
@@ -63,7 +57,7 @@ contract HabaCoin is ERC20, Ownable, ReentrancyGuard {
             _rewards[target].accruedBalance += allocationAmount;
             
             unchecked {
-                ++i;
+                i++;
             }
         }
     }
