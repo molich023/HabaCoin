@@ -1,70 +1,26 @@
 // SPDX-License-Identifier: MIT
-pragma solidity >=0.8.20 <0.9.0;
+pragma solidity ^0.8.20;
 
-import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
-import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
-import {ReentrancyGuard} from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 
-/**
- * @title HabaCoin
- * @author HabaCoin Core Dev Team
- * @notice Production ledger token asset designed with a 1 Trillion Total Supply for Kenyan micropayment operations.
- * @dev Highly optimized, secure ERC20 token ledger with 1 Trillion Total Supply.
- */
-contract HabaCoin is ERC20, Ownable, ReentrancyGuard {
+contract HabaCoin is Initializable, ERC20Upgradeable, OwnableUpgradeable, UUPSUpgradeable {
     
-    error ZeroAddressDetected();
-    error ZeroAmountDetected();
-
-    struct RewardLedger {
-        uint128 accruedBalance;
-        uint64 totalClaimCycles;
-        uint64 lastClaimTimestamp;
+    /// @custom:oz-upgrades-unsafe-allow constructor
+    constructor() {
+        _disableInitializers();
     }
 
-    mapping(address => RewardLedger) private _rewards;
-    
-    /**
-     * @notice The constant total token supply caps out at exactly 1 Trillion units (scaled by 18 decimals)
-     */
-    uint256 public constant INITIAL_SUPPLY = 1_000_000_000_000 * 10**18;
+    function initialize(address initialOwner) public initializer {
+        __ERC20_init("HabaCoin", "HABA");
+        __Ownable_init(initialOwner);
+        __UUPSUpgradeable_init();
 
-    constructor() ERC20("HabaCoin", "HABA") Ownable(msg.sender) {
-        _mint(msg.sender, INITIAL_SUPPLY);
+        // 1 Trillion tokens (18 decimals)
+        _mint(initialOwner, 1000000000000 * 10**decimals());
     }
 
-    /**
-     * @notice Fetch structural user reward state securely
-     * @param account Target account query wallet
-     */
-    function getRewards(address account) external view returns (uint128, uint64, uint64) {
-        RewardLedger memory ledger = _rewards[account];
-        return (ledger.accruedBalance, ledger.totalClaimCycles, ledger.lastClaimTimestamp);
-    }
-
-    /**
-     * @notice Execute batch allocations of reward balances to a list of recipients
-     * @dev Process batch allocations gas-efficiently using optimized loop structures
-     * @param recipients Array of user target addresses to receive the allocations
-     * @param allocationAmount The precise atomic uint128 value distributed to each recipient
-     */
-    function processBatchAllocation(address[] calldata recipients, uint128 allocationAmount) 
-        external 
-        onlyOwner 
-        nonReentrant 
-    {
-        if (allocationAmount == 0) revert ZeroAmountDetected();
-        uint256 totalRecipients = recipients.length;
-        
-        for (uint256 i = 0; i < totalRecipients; ) {
-            address target = recipients[i];
-            if (target == address(0)) revert ZeroAddressDetected();
-            
-            _rewards[target].accruedBalance += allocationAmount;
-            
-            unchecked {
-                ++i;
-            }
-        }
-    }
+    function _authorizeUpgrade(address newImplementation) internal override onlyOwner {}
 }
